@@ -64,6 +64,7 @@ do
       echo "$hostname: ⧖"
     fi
   done
+  echo -e "--- Loop end ---"
 
   # Wait some time
 	sleep $AVAILABILITY_CHECK_INTERVAL_SECONDS
