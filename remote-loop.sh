@@ -46,6 +46,12 @@ do
     IFS=' ' read -r hostname_port host_interval_seconds command <<< "$host"
     IFS=: read -r hostname port <<< "$hostname_port"
 
+
+    # Ignore hosts entry if empty line or starts with # (comment)
+    if [[ "$hostname" == "" ]] || [[ "$hostname" == \#* ]]; then
+      continue;
+    fi
+
     now=$(timestamp)
     if (( database[$hostname] < $now - $host_interval_seconds  )); then
       echo "$hostname: Checking availability…"
