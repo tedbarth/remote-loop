@@ -58,7 +58,7 @@ do
       if nc -z $hostname ${port:-22} 2>/dev/null; then
           echo -e "${clearLine}${hostname}: Executing command…"
           ( # Subshell to not stop due to error
-            eval $command > "$LOG_DIR/$hostname.txt"
+            eval $command > "$LOG_DIR/$hostname.txt" 2>&1
           )
           database[$hostname]=$now
           save_db
