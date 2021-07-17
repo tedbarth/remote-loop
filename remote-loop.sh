@@ -31,7 +31,7 @@ i=0;
 while true
 do
   i=$((i+1))
-  echo -e "\nLoop #${i}"
+  echo -e "\n--- Loop #${i} ---"
 
 	# Read hosts file
 	hosts=()
