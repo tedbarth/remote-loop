@@ -61,7 +61,7 @@ do
           echo -e "${clearLine}$hostname: ✗"
       fi
     else
-      echo "$hostname: -"
+      echo "$hostname: ⧖"
     fi
   done
 
