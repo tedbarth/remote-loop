@@ -47,6 +47,24 @@ while true; do
     readarray -t hosts <"$HOSTS_FILE"
   fi
 
+  function executeSpecialCommand() {
+    declare name=$1
+
+    for host in "${hosts[@]}"; do
+      IFS=' ' read -r special command <<<"$host"
+      if [[ "$special" == $name* ]]; then
+        echo "$name command: Executing…"
+        ( # Subshell to not stop due to error
+          eval "$command" >"$LOG_DIR/$name.txt" 2>&1
+        )
+        success=$?
+        echo -e "${clearLine}$name command: $(return_code_symbol $success)"
+      fi
+    done
+  }
+
+  executeSpecialCommand "\$BEFORE_LOOP"
+
   # Loop over hosts
   for host in "${hosts[@]}"; do
     # Extract hostname and port
@@ -54,7 +72,7 @@ while true; do
     IFS=: read -r hostname port <<<"$hostname_port"
 
     # Ignore hosts entry if empty line or starts with # (comment)
-    if [[ "$hostname" == "" ]] || [[ "$hostname" == \#* ]]; then
+    if [[ "$hostname" == "" ]] || [[ "$hostname" == [\#$]* ]]; then
       continue
     fi
 
@@ -78,6 +96,9 @@ while true; do
       echo "$hostname: ⧖"
     fi
   done
+
+  executeSpecialCommand "\$AFTER_LOOP"
+
   echo -e "--- Loop end ---"
 
   # Wait some time
