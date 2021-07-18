@@ -22,7 +22,7 @@ function timestamp() {
 # Read update db and create file if not existing
 declare -A database
 if [ -f "$DATABASE_FILE" ]; then
-  source "${DATABASE_FILE}"
+  source "$DATABASE_FILE"
 else
   save_db
 fi
