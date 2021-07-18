@@ -19,6 +19,15 @@ function timestamp() {
   date +%s # current time in ms
 }
 
+function return_code_symbol() {
+  declare code="$1"
+  if [[ $code == 0 ]]; then
+    echo "✓"
+  else
+    echo "✗"
+  fi
+}
+
 # Read update db and create file if not existing
 declare -A database
 if [ -f "$DATABASE_FILE" ]; then
@@ -57,11 +66,13 @@ while true; do
         (# Subshell to not stop due to error
           eval $command >"$LOG_DIR/$hostname.txt" 2>&1
         )
+        success=$?
+
         database[$hostname]=$now
         save_db
-        echo -e "${clearLine}$hostname: ✓"
+        echo -e "${clearLine}$hostname: $(return_code_symbol $success)"
       else
-        echo -e "${clearLine}$hostname: ✗"
+        echo -e "${clearLine}$hostname: ?"
       fi
     else
       echo "$hostname: ⧖"
