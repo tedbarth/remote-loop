@@ -61,10 +61,10 @@ while true; do
     now=$(timestamp)
     if ((database[$hostname] < $now - $host_interval_seconds)); then
       echo "$hostname: Checking availability…"
-      if nc -z $hostname ${port:-22} 2>/dev/null; then
+      if nc -z "$hostname" ${port:-22} 2>/dev/null; then
         echo -e "${clearLine}${hostname}: Executing command…"
         (# Subshell to not stop due to error
-          eval $command >"$LOG_DIR/$hostname.txt" 2>&1
+          eval "$command" >"$LOG_DIR/$hostname.txt" 2>&1
         )
         success=$?
 
