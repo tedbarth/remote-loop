@@ -81,8 +81,13 @@ while true; do
       echo "$hostname: Checking availability…"
       if nc -z "$hostname" ${port:-22} 2>/dev/null; then
         echo -e "${clearLine}${hostname}: Executing command…"
+        host_log_dir="$LOG_DIR/$hostname.txt"
+
+        export now
+        export host
+        export host_log_dir
         (# Subshell to not stop due to error
-          eval "$command" >"$LOG_DIR/$hostname.txt" 2>&1
+          eval "$command" >"$host_log_dir" 2>&1
         )
         success=$?
 
