@@ -6,7 +6,7 @@ DATABASE_FILE="$WORKING_DIR/remote-loop.db"
 HOSTS_FILE="$WORKING_DIR/hosts.txt"
 LOG_DIR="$WORKING_DIR/log"
 
-clearLine='\e[1A\e[K'
+clearLine='\e[1A\e[K' # For clearing output on the stdout if supported
 
 # CODE
 mkdir -p "$LOG_DIR"
