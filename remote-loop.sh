@@ -76,14 +76,14 @@ while true; do
       continue
     fi
 
-    now=$(timestamp)
-    if ((database[$hostname] < $now - $host_interval_seconds)); then
+    host_start_timestamp_seconds=$(timestamp)
+    if ((database[$hostname] < $host_start_timestamp_seconds - $host_interval_seconds)); then
       echo "$hostname: Checking availability…"
       if nc -z "$hostname" ${port:-22} 2>/dev/null; then
         echo -e "${clearLine}${hostname}: Executing command…"
         host_log_file="$LOG_DIR/$hostname.txt"
 
-        export now
+        export host_start_timestamp_seconds
         export hostname
         export host_interval_seconds
         export host_log_file
@@ -92,7 +92,7 @@ while true; do
         )
         success=$?
 
-        database[$hostname]=$now
+        database[$hostname]=$host_start_timestamp_seconds
         save_db
         echo -e "${clearLine}$hostname: $(return_code_symbol $success)"
       else
