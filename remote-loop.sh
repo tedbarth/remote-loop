@@ -85,6 +85,7 @@ while true; do
 
         export now
         export hostname
+        export host_interval_seconds
         export host_log_file
         (# Subshell to not stop due to error
           eval "$command" >"$host_log_file" 2>&1
