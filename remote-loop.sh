@@ -84,7 +84,7 @@ while true; do
         host_log_file="$LOG_DIR/$hostname.txt"
 
         export now
-        export host
+        export hostname
         export host_log_file
         (# Subshell to not stop due to error
           eval "$command" >"$host_log_file" 2>&1
