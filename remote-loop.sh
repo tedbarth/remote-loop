@@ -5,6 +5,7 @@ AVAILABILITY_CHECK_INTERVAL_SECONDS=${1:-60} # default 60s
 DATABASE_FILE="$WORKING_DIR/remote-loop.db"
 HOSTS_FILE="$WORKING_DIR/hosts.txt"
 LOG_DIR="$WORKING_DIR/log"
+TIMEOUT=3
 
 clearLine='\e[1A\e[K' # For clearing output on the stdout if supported
 
@@ -28,6 +29,57 @@ function return_code_symbol() {
   fi
 }
 
+function extractHostAndPort () {
+  address=$1
+
+  if [[ "$address" = [* ]]; then
+    host=$(echo "$address" | sed -nr 's/\[(.*)](:[0-9]+)?/\1/p')
+    port=$(echo "$address" | sed -nr 's/.+]:([0-9]+)/\1/p')
+  else
+    colonCount=$(echo "$address"| grep -o ":" | wc -l)
+    if (( $colonCount > 1 )); then
+      host="$address"
+      port=""
+    else
+      IFS=: read -r host port <<<"$address"
+    fi
+  fi
+
+  echo "$host"
+  echo "$port"
+}
+
+function getFirstAvailableHost() {
+  raw_hosts=$1
+  IFS=',' read -ra addresses <<< "$raw_hosts"
+
+  for address in "${addresses[@]}"; do
+    {
+      read -r host
+      read -r port
+    } <<< "$( extractHostAndPort "$address" )"
+
+    defaultedPort=${port:-22}
+
+    #echo "Testing host '${host}' with port ${defaultedPort}" 1>&2
+    if ip -6 route get "$host/128" >/dev/null 2>&1; then
+      nc -6 -z -w "$TIMEOUT" "$host" "$defaultedPort" #2>/dev/null
+    else
+      nc    -z -w "$TIMEOUT" "$host" "$defaultedPort" 2>/dev/null
+    fi
+    available=$?
+
+    if [[ $available == 0 ]]; then
+      echo "$host"
+      echo "$defaultedPort"
+      return 0
+    fi
+
+  done
+
+  return 1 # Nothing found
+}
+
 # Read update db and create file if not existing
 declare -A database
 if [ -f "$DATABASE_FILE" ]; then
@@ -42,49 +94,39 @@ while true; do
   echo -e "\n--- Loop #${i} ---"
 
   # Read hosts file
-  hosts=()
   if [ -f "$HOSTS_FILE" ]; then
-    readarray -t hosts <"$HOSTS_FILE"
+    # First ignore comments and empty lines with grep, then remove leading and finally trailing
+    # whitespaces with sed.
+    IFS=$'\n' hosts=($(cat "$HOSTS_FILE" \
+      | grep -v -E "^\s*(#.*)*$" \
+      | sed -e 's/^[ \t]*//' \
+      | sed -e 's/[ \t]*$//'))
   fi
 
-  function executeSpecialCommand() {
-    declare name=$1
-
-    for host in "${hosts[@]}"; do
-      IFS=' ' read -r special command <<<"$host"
-      if [[ "$special" == $name* ]]; then
-        echo "$name command: Executing…"
-        ( # Subshell to not stop due to error
-          eval "$command" >"$LOG_DIR/$name.txt" 2>&1
-        )
-        success=$?
-        echo -e "${clearLine}$name command: $(return_code_symbol $success)"
-      fi
-    done
-  }
-
-  executeSpecialCommand "\$BEFORE_LOOP"
-
   # Loop over hosts
-  for host in "${hosts[@]}"; do
-    # Extract hostname and port
-    IFS=' ' read -r hostname_port host_interval_seconds command <<<"$host"
-    IFS=: read -r hostname port <<<"$hostname_port"
-
-    # Ignore hosts entry if empty line or starts with # (comment)
-    if [[ "$hostname" == "" ]] || [[ "$hostname" == [\#$]* ]]; then
-      continue
-    fi
+  for entry in "${hosts[@]}"; do
+    IFS=' ' read -r id addresses host_interval_seconds command <<<"$entry"
+    echo
+    echo "Id: $id"
+    echo "Addresses: $addresses"
+    echo "Interval: $host_interval_seconds"
+    echo "Command: $command"
 
     host_start_timestamp_seconds=$(timestamp)
-    if ((database[$hostname] < $host_start_timestamp_seconds - $host_interval_seconds)); then
-      echo "$hostname: Checking availability…"
-      if nc -z "$hostname" ${port:-22} 2>/dev/null; then
-        echo -e "${clearLine}${hostname}: Executing command…"
-        host_log_file="$LOG_DIR/$hostname.txt"
+    if ((database[$id] < $host_start_timestamp_seconds - $host_interval_seconds)); then
+      echo "Result: Checking availability…"
+      {
+        read -r host
+        read -r port
+      } <<< "$( getFirstAvailableHost $addresses )"
+      available=$?
+
+      if [[ $available == 0 ]]; then
+        echo -e "${clearLine}${id}: Executing command…"
+        host_log_file="$LOG_DIR/$id.txt"
 
         export host_start_timestamp_seconds
-        export hostname
+        export id
         export host_interval_seconds
         export host_log_file
         export -f timestamp
@@ -93,18 +135,16 @@ while true; do
         )
         success=$?
 
-        database[$hostname]=$host_start_timestamp_seconds
+        database[$id]=$host_start_timestamp_seconds
         save_db
-        echo -e "${clearLine}$hostname: $(return_code_symbol $success)"
+        echo -e "${clearLine}Result: $(return_code_symbol $success)"
       else
-        echo -e "${clearLine}$hostname: ?"
+        echo -e "${clearLine}Result: ?"
       fi
     else
-      echo "$hostname: ⧖"
+      echo "$id: ⧖"
     fi
   done
-
-  executeSpecialCommand "\$AFTER_LOOP"
 
   echo -e "--- Loop end ---"
 
