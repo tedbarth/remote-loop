@@ -3,7 +3,7 @@
 WORKING_DIR=$(dirname "$0")
 AVAILABILITY_CHECK_INTERVAL_SECONDS=${1:-60} # default 60s
 DATABASE_FILE="$WORKING_DIR/remote-loop.db"
-HOSTS_FILE="$WORKING_DIR/host_entries.txt"
+HOSTS_FILE="$WORKING_DIR/hosts.txt"
 LOG_DIR="$WORKING_DIR/log"
 TIMEOUT=3
 
@@ -131,7 +131,6 @@ while true; do
         export port
         export host_interval_seconds
         export host_log_file
-        export -f timestamp
         (# Subshell to not stop due to error
           eval "$command" >"$host_log_file" 2>&1
         )
