@@ -5,7 +5,7 @@ AVAILABILITY_CHECK_INTERVAL_SECONDS=${1:-60} # default 60s
 DATABASE_FILE="$WORKING_DIR/remote-loop.db"
 HOSTS_FILE="$WORKING_DIR/hosts.txt"
 LOG_DIR="$WORKING_DIR/log"
-TIMEOUT=1
+AVAILABILITY_TIMEOUT=1
 
 # ------ CODE ------
 clearLine='\e[1A\e[K' # For clearing output on the stdout if supported
@@ -63,9 +63,9 @@ function getFirstAvailableHost() {
 
     #echo "Testing host '${host}' with port ${defaultedPort}" 1>&2
     if ip -6 route get "$host/128" >/dev/null 2>&1; then
-      nc -6 -z -w "$TIMEOUT" "$host" "$defaultedPort" 2>/dev/null
+      nc -6 -z -w "$AVAILABILITY_TIMEOUT" "$host" "$defaultedPort" 2>/dev/null
     else
-      nc    -z -w "$TIMEOUT" "$host" "$defaultedPort" 2>/dev/null
+      nc    -z -w "$AVAILABILITY_TIMEOUT" "$host" "$defaultedPort" 2>/dev/null
     fi
     available=$?
 
@@ -82,7 +82,7 @@ function getFirstAvailableHost() {
 
 echo "Started remote-loop with settings:"
 echo "Availability interval: ${AVAILABILITY_CHECK_INTERVAL_SECONDS}"
-echo "Availability timeout: ${TIMEOUT}"
+echo "Availability timeout: ${AVAILABILITY_TIMEOUT}"
 echo "Working directory: ${WORKING_DIR}"
 
 i=0
