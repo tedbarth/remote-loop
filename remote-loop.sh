@@ -5,7 +5,7 @@ AVAILABILITY_CHECK_INTERVAL_SECONDS=${1:-60} # default 60s
 DATABASE_FILE="$WORKING_DIR/remote-loop.db"
 HOSTS_FILE="$WORKING_DIR/hosts.txt"
 LOG_DIR="$WORKING_DIR/log"
-TIMEOUT=3
+TIMEOUT=1
 
 clearLine='\e[1A\e[K' # For clearing output on the stdout if supported
 
