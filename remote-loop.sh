@@ -3,7 +3,7 @@
 WORKING_DIR=$(dirname "$0")
 AVAILABILITY_CHECK_INTERVAL_SECONDS=${1:-60} # default 60s
 DATABASE_FILE="$WORKING_DIR/remote-loop.db"
-HOSTS_FILE="$WORKING_DIR/hosts.txt"
+HOSTS_FILE="$WORKING_DIR/host_entries.txt"
 LOG_DIR="$WORKING_DIR/log"
 TIMEOUT=3
 
@@ -93,18 +93,18 @@ while true; do
   i=$((i + 1))
   echo -e "\n--- Loop #${i} ---"
 
-  # Read hosts file
+  # Read host_entries file
   if [ -f "$HOSTS_FILE" ]; then
     # First ignore comments and empty lines with grep, then remove leading and finally trailing
     # whitespaces with sed.
-    IFS=$'\n' hosts=($(cat "$HOSTS_FILE" \
+    IFS=$'\n' host_entries=($(cat "$HOSTS_FILE" \
       | grep -v -E "^\s*(#.*)*$" \
       | sed -e 's/^[ \t]*//' \
       | sed -e 's/[ \t]*$//'))
   fi
 
-  # Loop over hosts
-  for entry in "${hosts[@]}"; do
+  # Loop over host_entries
+  for entry in "${host_entries[@]}"; do
     IFS=' ' read -r id addresses host_interval_seconds command <<<"$entry"
     echo
     echo "Id: $id"
