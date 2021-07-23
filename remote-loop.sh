@@ -80,18 +80,18 @@ function getFirstAvailableHost() {
   return 1 # Nothing found
 }
 
-# Read update db and create file if not existing
-declare -A database
-if [ -f "$DATABASE_FILE" ]; then
-  source "$DATABASE_FILE"
-else
-  save_db
-fi
-
 i=0
 while true; do
   i=$((i + 1))
   echo -e "\n--- Loop #${i} ---"
+
+  # Read update db and create file if not existing
+  if [ -f "$DATABASE_FILE" ]; then
+    source "$DATABASE_FILE"
+  else
+    declare -A database
+    save_db
+  fi
 
   # Read host_entries file
   if [ -f "$HOSTS_FILE" ]; then
