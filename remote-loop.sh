@@ -89,7 +89,7 @@ while true; do
   if [ -f "$DATABASE_FILE" ]; then
     source "$DATABASE_FILE"
   else
-    declare -A database
+    declare -A database=()
     save_db
   fi
 
