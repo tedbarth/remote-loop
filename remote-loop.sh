@@ -127,6 +127,8 @@ while true; do
 
         export host_start_timestamp_seconds
         export id
+        export host
+        export port
         export host_interval_seconds
         export host_log_file
         export -f timestamp
