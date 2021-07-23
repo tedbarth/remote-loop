@@ -123,6 +123,7 @@ while true; do
 
       if [[ $available == 0 ]]; then
         echo -e "${clearLine}${id}: Executing command…"
+        mkdir -p "$LOG_DIR" # Recreate dir removed
         host_log_file="$LOG_DIR/$id.txt"
 
         export RL_HOST_START_TIMESTAMP_SECONDS="$host_start_timestamp_seconds"
