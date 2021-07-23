@@ -131,7 +131,6 @@ while true; do
         export RL_PORT="$port"
         export RL_HOST_INTERVAL_SECONDS="$host_interval_seconds"
         export RL_HOST_LOG_FILE="$host_log_file"
-        export -f timestamp
         (# Subshell to not stop due to error
           eval "$command" >"$host_log_file" 2>&1
         )
