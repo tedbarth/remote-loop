@@ -105,11 +105,11 @@ while true; do
 
   # Loop over host_entries
   for entry in "${host_entries[@]}"; do
-    IFS=' ' read -r id addresses host_interval_seconds command <<<"$entry"
+    IFS=' ' read -r id host_interval_seconds addresses command <<<"$entry"
     echo
     echo "Id: $id"
-    echo "Addresses: $addresses"
     echo "Interval: $host_interval_seconds"
+    echo "Addresses: $addresses"
     echo "Command: $command"
 
     host_start_timestamp_seconds=$(timestamp)
