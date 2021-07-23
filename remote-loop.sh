@@ -1,5 +1,5 @@
 #!/bin/bash
-# CONFIG
+# ------ CONFIG ------
 WORKING_DIR=$(dirname "$0")
 AVAILABILITY_CHECK_INTERVAL_SECONDS=${1:-60} # default 60s
 DATABASE_FILE="$WORKING_DIR/remote-loop.db"
@@ -7,9 +7,9 @@ HOSTS_FILE="$WORKING_DIR/hosts.txt"
 LOG_DIR="$WORKING_DIR/log"
 TIMEOUT=1
 
+# ------ CODE ------
 clearLine='\e[1A\e[K' # For clearing output on the stdout if supported
 
-# CODE
 mkdir -p "$LOG_DIR"
 
 function save_db() {
