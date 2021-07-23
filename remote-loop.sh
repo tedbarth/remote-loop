@@ -80,6 +80,11 @@ function getFirstAvailableHost() {
   return 1 # Nothing found
 }
 
+echo "Started remote-loop with settings:"
+echo "Availability interval: ${AVAILABILITY_CHECK_INTERVAL_SECONDS}"
+echo "Availability timeout: ${TIMEOUT}"
+echo "Working directory: ${WORKING_DIR}"
+
 i=0
 while true; do
   i=$((i + 1))
