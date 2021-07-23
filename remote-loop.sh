@@ -63,7 +63,7 @@ function getFirstAvailableHost() {
 
     #echo "Testing host '${host}' with port ${defaultedPort}" 1>&2
     if ip -6 route get "$host/128" >/dev/null 2>&1; then
-      nc -6 -z -w "$TIMEOUT" "$host" "$defaultedPort" #2>/dev/null
+      nc -6 -z -w "$TIMEOUT" "$host" "$defaultedPort" 2>/dev/null
     else
       nc    -z -w "$TIMEOUT" "$host" "$defaultedPort" 2>/dev/null
     fi
