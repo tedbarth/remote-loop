@@ -1,11 +1,56 @@
 #!/bin/bash
 # ------ CONFIG ------
-WORKING_DIR=$(dirname "$0")
-AVAILABILITY_CHECK_INTERVAL_SECONDS=${1:-60} # default 60s
+DEFAULT_AVAILABILITY_INTERVAL_SECONDS=60
+DEFAULT_WORKING_DIR="${PWD}"
+DEFAULT_AVAILABILITY_TIMEOUT_SECONDS=1
+
+# Override defaults
+for i in "$@"
+do
+case $i in
+    --help)
+    echo "Script to repeatedly check for host availability via ssh, to automatically call commands."
+    echo "Usage: $(basename "$0") [OPTIONS]"
+    echo
+    echo "Options:"
+    echo "--help          Shows this help text."
+    echo "--workingDir    Set working directory database, log and hosts file path are based on"
+    echo "                (defaults to current dir found under \$PWD')."
+    echo "--interval      Set availability loop interval in seconds (defaults to '${DEFAULT_AVAILABILITY_INTERVAL_SECONDS}')."
+    echo "--timeout       Set availability check timeout per host address (defaults to '${DEFAULT_AVAILABILITY_TIMEOUT_SECONDS}')."
+    exit 0
+    ;;
+
+    --workingDir=*)
+    ARG_WORKING_DIR="${i#*=}"
+    shift
+    ;;
+
+    --interval=*)
+    ARG_AVAILABILITY_INTERVAL_SECONDS="${i#*=}"
+    shift
+    ;;
+
+    --timeout=*)
+    ARG_AVAILABILITY_TIMEOUT_SECONDS="${i#*=}"
+    shift
+    ;;
+
+    *) # unknown option
+    echo "ERROR: Unknown option '${i}'"
+    exit 1
+    ;;
+esac
+done
+
+# Argument defaulting
+AVAILABILITY_INTERVAL_SECONDS=${ARG_AVAILABILITY_INTERVAL_SECONDS:-${DEFAULT_AVAILABILITY_INTERVAL_SECONDS}} # default 60s
+AVAILABILITY_TIMEOUT_SECONDS=${ARG_AVAILABILITY_TIMEOUT_SECONDS:-${DEFAULT_AVAILABILITY_TIMEOUT_SECONDS}}
+WORKING_DIR=${ARG_WORKING_DIR:${DEFAULT_WORKING_DIR}}
+
 DATABASE_FILE="$WORKING_DIR/remote-loop.db"
 HOSTS_FILE="$WORKING_DIR/hosts.txt"
 LOG_DIR="$WORKING_DIR/log"
-AVAILABILITY_TIMEOUT_SECONDS=1
 
 # ------ CODE ------
 clearLine='\e[1A\e[K' # For clearing output on the stdout if supported
@@ -81,7 +126,7 @@ function getFirstAvailableHost() {
 }
 
 echo "Started remote-loop with settings:"
-echo "Availability interval: ${AVAILABILITY_CHECK_INTERVAL_SECONDS}s"
+echo "Availability interval: ${AVAILABILITY_INTERVAL_SECONDS}s"
 echo "Availability timeout: ${AVAILABILITY_TIMEOUT_SECONDS}s"
 echo "Working directory: ${WORKING_DIR}"
 
@@ -156,5 +201,5 @@ while true; do
   echo -e "--- Loop end ---"
 
   # Wait some time
-  sleep $AVAILABILITY_CHECK_INTERVAL_SECONDS
+  sleep $AVAILABILITY_INTERVAL_SECONDS
 done
