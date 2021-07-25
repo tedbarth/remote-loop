@@ -78,11 +78,13 @@ function extractHostAndPort () {
   address=$1
 
   if [[ "$address" = [* ]]; then
+    rawHost=$(echo "$address" | sed -nr 's/(\[.*])(:[0-9]+)?/\1/p')
     host=$(echo "$address" | sed -nr 's/\[(.*)](:[0-9]+)?/\1/p')
     port=$(echo "$address" | sed -nr 's/.+]:([0-9]+)/\1/p')
   else
     colonCount=$(echo "$address"| grep -o ":" | wc -l)
     if (( $colonCount > 1 )); then
+      rawHost="$address"
       host="$address"
       port=""
     else
@@ -90,6 +92,7 @@ function extractHostAndPort () {
     fi
   fi
 
+  echo "$rawHost"
   echo "$host"
   echo "$port"
 }
@@ -100,6 +103,7 @@ function getFirstAvailableHost() {
 
   for address in "${addresses[@]}"; do
     {
+      read -r rawHost
       read -r host
       read -r port
     } <<< "$( extractHostAndPort "$address" )"
@@ -115,6 +119,7 @@ function getFirstAvailableHost() {
     available=$?
 
     if [[ $available == 0 ]]; then
+      echo "$rawHost"
       echo "$host"
       echo "$defaultedPort"
       return 0
@@ -166,6 +171,7 @@ while true; do
     if ((database[$id] < $host_start_timestamp_seconds - $host_interval_seconds)); then
       echo "Result: Checking availability…"
       {
+        read -r rawHost
         read -r host
         read -r port
       } <<< "$( getFirstAvailableHost $addresses )"
@@ -178,6 +184,7 @@ while true; do
 
         export RL_HOST_START_TIMESTAMP_SECONDS="$host_start_timestamp_seconds"
         export RL_ID="$id"
+        export RL_RAW_HOST="$rawHost"
         export RL_HOST="$host"
         export RL_PORT="$port"
         export RL_HOST_INTERVAL_SECONDS="$host_interval_seconds"
