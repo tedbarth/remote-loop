@@ -200,7 +200,7 @@ while true; do
         save_db
         echo -e "${clearLine}Result: $(return_code_symbol $success) for ${rawHost} with port ${port}"
       else
-        echo -e "${clearLine}Result: ?"
+        echo -e "${clearLine}Result: UNAVAILABLE"
       fi
     else
       echo "$id: IDLE"
