@@ -198,7 +198,7 @@ while true; do
 
         database[$id]=$host_start_timestamp_seconds
         save_db
-        echo -e "${clearLine}Result: $(return_code_symbol $success)"
+        echo -e "${clearLine}Result: $(return_code_symbol $success) for ${rawHost} with port ${port}"
       else
         echo -e "${clearLine}Result: ?"
       fi
