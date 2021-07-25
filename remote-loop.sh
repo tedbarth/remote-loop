@@ -68,9 +68,9 @@ function timestamp() {
 function return_code_symbol() {
   declare code="$1"
   if [[ $code == 0 ]]; then
-    echo "✓"
+    echo "SUCCESS"
   else
-    echo "✗"
+    echo "ERROR"
   fi
 }
 
@@ -203,7 +203,7 @@ while true; do
         echo -e "${clearLine}Result: ?"
       fi
     else
-      echo "$id: ⧖"
+      echo "$id: IDLE"
     fi
   done
 
