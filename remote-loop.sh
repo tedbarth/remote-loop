@@ -16,8 +16,8 @@ case $i in
     echo "--help          Shows this help text."
     echo "--workingDir    Set working directory database, log and hosts file path are based on"
     echo "                (defaults to current dir found under \$PWD')."
-    echo "--interval      Set availability loop interval in seconds (defaults to '${DEFAULT_AVAILABILITY_INTERVAL_SECONDS}')."
-    echo "--timeout       Set availability check timeout per host address (defaults to '${DEFAULT_AVAILABILITY_TIMEOUT_SECONDS}')."
+    echo "--interval      Set availability loop interval in seconds (defaults to '${DEFAULT_AVAILABILITY_INTERVAL_SECONDS}s')."
+    echo "--timeout       Set availability check timeout per host address (defaults to '${DEFAULT_AVAILABILITY_TIMEOUT_SECONDS}s')."
     exit 0
     ;;
 
