@@ -84,11 +84,12 @@ function extractHostAndPort () {
   else
     colonCount=$(echo "$address"| grep -o ":" | wc -l)
     if (( $colonCount > 1 )); then
-      rawHost="$address"
+      rawHost="[$address]"
       host="$address"
       port=""
     else
       IFS=: read -r host port <<<"$address"
+      rawHost="$host"
     fi
   fi
 
